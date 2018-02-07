@@ -39,6 +39,8 @@ const paths = require('../config/paths');
 const config = require('../config/webpack.config.dev');
 const createDevServerConfig = require('../config/webpackDevServer.config');
 
+const bonjour = require('bonjour');
+
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 
@@ -100,8 +102,11 @@ choosePort(HOST, DEFAULT_PORT)
       openBrowser(urls.localUrlForBrowser);
     });
 
+    bonjour.publish({ name: 'dsandy', type: 'http', port: port });
+
     ['SIGINT', 'SIGTERM'].forEach(function(sig) {
       process.on(sig, function() {
+        bonjour.destroy();
         devServer.close();
         process.exit();
       });
